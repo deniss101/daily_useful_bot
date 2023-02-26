@@ -12,7 +12,7 @@ con = sqlite3.connect('cinema_sessions.db', check_same_thread=False)
 
 def get_cinema_sessions():
     cur = con.cursor()
-    cur.execute("DROP TABLE if exists sessions")
+    cur.execute('DROP TABLE if exists sessions')
     #cur.execute("CREATE TABLE if not exists sessions (id, title, cinema, address, subway, time, price)")
     cur.execute('CREATE TABLE IF NOT EXISTS sessions (id INTEGER, title TEXT, cinema TEXT, address TEXT, subway TEXT, time TEXT, price TEXT)')
     id_list, title_list = [], []
@@ -41,7 +41,7 @@ def get_cinema_sessions():
                 price = show['price']
                 print(movie_id, title_list[title_start], title, address, subway, time, price)
                 cur.execute("INSERT INTO sessions (id, title, cinema, address, subway, time, price) VALUES(?, ?, ?, ?, ?, ?, ?)",
-                            (movie_id, title_list[title_start], title, address, subway, time, price))
+                            ('id' + movie_id, title_list[title_start], title, address, subway, time, price))
         title_start += 1
 
     con.commit()
@@ -51,8 +51,8 @@ def get_cinema_sessions():
 def sql_read_title_id():
     con.row_factory = lambda cursor, row: row[0]
     cur = con.cursor()
-    films = cur.execute("SELECT DISTINCT title FROM sessions ").fetchall()
-    ids = cur.execute("SELECT DISTINCT id FROM sessions ").fetchall()
+    films = cur.execute("SELECT DISTINCT title FROM sessions").fetchall()
+    ids = cur.execute("SELECT DISTINCT id FROM sessions").fetchall()
     cur.close()
     return films, ids
 

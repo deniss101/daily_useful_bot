@@ -3,7 +3,7 @@ from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters import Text
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from functions import client_kb, inline_kb, back_kb
+from functions import client_kb, inline_kb, inline_kb_city, inline_kb_date, back_kb
 
 from functions import films_parse
 from functions import openweathermap
@@ -27,12 +27,13 @@ async def command_start(message: types.Message):
 #@disp.message_handler(commands=['Идём в кино'])
 async def cinema(message: types.Message):
     #films, film_ids = films_parse.sql_read_title_id()
-    await message.answer('Фильмы:', reply_markup=inline_kb)
+    await message.answer('Выберите город:', reply_markup=inline_kb_city)
+    #await message.answer('Фильмы:', reply_markup=inline_kb)
 
 
 #@disp.message_handler(commands=['Расписание'])
-async def transport_shedule(message: types.Message):
-    await message.answer(trains.trains_request(), reply_markup=client_kb)
+#async def transport_schedule(message: types.Message):
+#    await message.answer(trains.trains_request(), reply_markup=client_kb)
 
 
 #@disp.message_handler(commands=['Погода'])
@@ -50,7 +51,20 @@ async def command_else(message: types.Message):  # declared last. catches all me
     await message.answer('Не понимаю команду')
 
 
-@disp.callback_query_handler(Text(startswith='5'))
+@disp.callback_query_handler(Text(startswith='city_'))
+async def city_callback(callback: types.CallbackQuery):
+    #data = callback.data.replace('city_', '')
+    await callback.message.answer('Выберите дату:', reply_markup=inline_kb_date)
+    await callback.answer()
+
+
+@disp.callback_query_handler(Text(startswith='day'))
+async def date_callback(callback: types.CallbackQuery):
+    await callback.message.answer('Фильмы:', reply_markup=inline_kb)
+    await callback.answer()
+
+
+@disp.callback_query_handler(Text(startswith=[i for i in range(10)]))
 async def test_callback(callback: types.CallbackQuery):
     film_name = sqlite_db.sql_read_film_name(callback.data)
     await callback.message.answer(f'{film_name[0]}:')
@@ -68,7 +82,7 @@ async def test_callback(callback: types.CallbackQuery):
 def register_client_handlers(disp: Dispatcher):
     disp.register_message_handler(command_start, commands=['start', 'help'])
     disp.register_message_handler(cinema, Text(equals='Идём в кино'))
-    disp.register_message_handler(transport_shedule, Text(equals='Расписание'))
+    #disp.register_message_handler(transport_schedule, Text(equals='Расписание'))
     disp.register_message_handler(weather, Text(equals='Погода'))
     disp.register_message_handler(back, Text(equals='Назад'))
-    disp.register_message_handler(command_else)
+    #disp.register_message_handler(command_else)
